@@ -1,0 +1,25 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class DateUtil {
+    public DateUtil() {
+    }
+
+    public static String getTimeId() {
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("HHmmss");
+        return sdf.format(date);
+    }
+
+    public static String getNowTime() {
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        return sdf.format(date);
+    }
+}
