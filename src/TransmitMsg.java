@@ -59,7 +59,7 @@ public class TransmitMsg {
      */
     private void CrossThreadSendMsg(int otheruserId,String msgstr)
     {
-
+        msgstr=msgstr+"\n";
         for(int i = 0; i < mSocketList.size(); ++i) {
             SocketBean socketBean = (SocketBean)(mSocketList.get(i));
             if (otheruserId == socketBean.userId) {
@@ -110,6 +110,7 @@ public class TransmitMsg {
          */
         private void sendMsg(String msgstr)
         {
+            msgstr=msgstr+"\n";
             try{
                 OutputStream mWriter = null;
                 mWriter = mSocket.getOutputStream();      //创建数据发送器
@@ -149,25 +150,49 @@ public class TransmitMsg {
                     /******************************接收到数据后进行处理*********************************/
                     if (rcvstrs[0].equals("LoginReq") )                        //登录请求
                     {
-                        int loginstate = 0;
+                        String loginstate = "0";
                         UserBean userBean = sqlconn.selectUser(rcvstrs[1]);         //获取登录名的userbean
                         if(userBean!=null)                                          //存在该username
                         {
                             if(userBean.getPassWord().equals(rcvstrs[2]))                //密码相等
                             {
-                                loginstate = 0;
-                                msgstr = ProcessString.addstr("LoginResp",Integer.toString(loginstate),Long.toString(userBean.getId()),userBean.getNickName());
+                                loginstate = "0";
+                                msgstr = ProcessString.addstr("LoginResp",loginstate,Long.toString(userBean.getId()),userBean.getNickName());
                             }else{                                                  //密码不等
-                                loginstate = 2;
-                                msgstr = ProcessString.addstr("LoginResp",Integer.toString(loginstate));
+                                loginstate = "2";
+                                msgstr = ProcessString.addstr("LoginResp",loginstate);
                             }
                         }
                         else
                         {
-                            loginstate = 1;
-                            msgstr = ProcessString.addstr("LoginResp",Integer.toString(loginstate));
+                            loginstate = "1";
+                            msgstr = ProcessString.addstr("LoginResp",loginstate);
                         }
                             sendMsg(msgstr);
+                    }
+                    if(rcvstrs[0].equals("RegisterReq"))
+                    {
+                        String registerstate = "0";
+                        UserBean userBean1 = sqlconn.selectUser(rcvstrs[2]);         //获取登录名的userbean
+                        if(userBean1!=null)                                          //存在该username
+                        {
+                            registerstate = "1";
+                        }else{
+                            UserBean userBean = new UserBean();
+                            userBean.setNickName(rcvstrs[1]);
+                            userBean.setUserName(rcvstrs[2]);
+                            userBean.setPassWord(rcvstrs[3]);
+                            if(1==sqlconn.insert(userBean))
+                            {
+                                registerstate = "0";                                //成功
+                            }else
+                            {
+                                registerstate = "2";                                    //未知的错误
+                            }
+
+                        }
+                        msgstr = ProcessString.addstr("RegisterResp",registerstate);
+                        sendMsg(msgstr);
                     }
 
 

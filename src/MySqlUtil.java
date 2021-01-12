@@ -54,6 +54,26 @@ class MySqlUtil{
         }
         return userBean;
     }
+    public int insert(UserBean userBean)
+    {
+        int i=0;
+        String sql="insert into user values(?,?,?,?)";
+
+        try{
+            PreparedStatement preStmt =conn.prepareStatement(sql);
+            preStmt.setInt(1,0);
+            preStmt.setString(2,userBean.getNickName());
+            preStmt.setString(3,userBean.getUserName());
+            preStmt.setString(4,userBean.getPassWord());
+            i=preStmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return i;//返回影响的行数，1为执行成功
+    }
+
     /*
     public int insert()
     {
