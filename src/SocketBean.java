@@ -5,7 +5,7 @@
 
 import java.net.Socket;
 
-    public class SocketBean {
+public class SocketBean {
     public Socket socket;
     public String threadId;           //线程ID，不显示，不知道有啥用
     public int userId;       //用户ID，不显示

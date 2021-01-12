@@ -1,5 +1,3 @@
-
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,6 +23,12 @@ public class TransmitMsg {
     private static String SOCKET_IP = null;
     private static final int SOCKET_PORT = 826;
     public static ArrayList<SocketBean> mSocketList = new ArrayList();
+    private MySqlUtil sqlconn = null;
+
+    /**
+     * openServer
+     * 打开服务器并阻塞检测申请
+     */
     public void openServer() {
         try {
             InetAddress inetAddress = InetAddress.getLocalHost();  //获取本机ip
@@ -74,6 +78,13 @@ public class TransmitMsg {
     }
 
     /**
+     * 设置连接的mysql connection
+     * @param conn
+     * 自定义MySqlUtil类
+     */
+    public void setSqlcon(MySqlUtil conn){sqlconn=conn;}
+
+    /**
      * serverThread类
      * Socket成功连接后新建该类并放入线程中运行
      */
@@ -119,16 +130,47 @@ public class TransmitMsg {
         public void run() {
             try {
                 String content = null;
-                String msgstr = "偷偷告诉你, HG is harpy\n";
+                String msgstr = null;
                 while ((content = mReader.readLine()) != null) {
+                    /******************************提取数据串*********************************/
+                    String[] rcvstrs;
+                    try{
+                        rcvstrs = ProcessString.splitstr(content);
+                        for(String str : rcvstrs)
+                        {
+                            System.out.println(str);
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        System.out.println("receive wrong");
+                        continue;
+                    }
+
                     /******************************接收到数据后进行处理*********************************/
-//                    String[] splitContent = content.split("\\|");   //分割成Action |length|data ...
+                    if (rcvstrs[0].equals("LoginReq") )                        //登录请求
+                    {
+                        int loginstate = 0;
+                        UserBean userBean = sqlconn.selectUser(rcvstrs[1]);         //获取登录名的userbean
+                        if(userBean!=null)                                          //存在该username
+                        {
+                            if(userBean.getPassWord().equals(rcvstrs[2]))                //密码相等
+                            {
+                                loginstate = 0;
+                                msgstr = ProcessString.addstr("LoginResp",Integer.toString(loginstate),Long.toString(userBean.getId()),userBean.getNickName());
+                            }else{                                                  //密码不等
+                                loginstate = 2;
+                                msgstr = ProcessString.addstr("LoginResp",Integer.toString(loginstate));
+                            }
+                        }
+                        else
+                        {
+                            loginstate = 1;
+                            msgstr = ProcessString.addstr("LoginResp",Integer.toString(loginstate));
+                        }
+                            sendMsg(msgstr);
+                    }
 
 
-
-
-                    System.out.println("receive message:"+content);
-                    sendMsg(msgstr);
                     /******************************数据处理完毕，等待下次接收数据*************************/
                 }
             } catch (Exception e) {
