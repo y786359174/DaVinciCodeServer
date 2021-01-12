@@ -6,17 +6,59 @@
 import java.net.Socket;
 
 public class SocketBean {
-    public Socket socket;
-    public String threadId;           //线程ID，不显示，不知道有啥用
-    public int userId;       //用户ID，不显示
-    public String userName;     //用户名，仅登录
-    public String nickName;     //昵称，显示用
-    public String loginTime;
+    private Socket socket;
+    private String threadId;             //线程ID，不显示，不知道有啥用
+    private Long Id;                      //用户ID，不显示
+    private String userName;             //用户名，仅登录
+    private String nickName;             //昵称，显示用
+    private String loginTime;
 
-    public SocketBean(Socket socket,String threadId) {
+    public Socket getSocket() {
+        return socket;
+    }
+
+
+    public String getThreadId() {
+        return threadId;
+    }
+
+
+    public Long getId() {
+        return Id;
+    }
+
+    public void setId(Long id) {
+        Id = id;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getLoginTime() {
+        return loginTime;
+    }
+
+    public void setLoginTime(String loginTime) {
+        this.loginTime = loginTime;
+    }
+
+    public SocketBean(Socket socket, String threadId) {
         this.socket = socket;
         this.threadId = threadId;
-        this.userId = 0;    //0代表空
+        this.Id = Long.valueOf(0);    //0代表空
         this.userName = "";
         this.nickName = "";
         this.loginTime = "";

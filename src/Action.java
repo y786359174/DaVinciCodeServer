@@ -49,4 +49,15 @@ public class Action {
      * Eg.  LoginResp|1                 //账号重复
      * Eg.  LoginResp|2                 //未知的错误
      */
+
+    public static final String SpeakOutReq = "SpeakOutReq";
+    /**
+     * 大厅发送消息请求
+     * Eg.  SpeakOutReq|NickName|SpeakOutMsg
+     */
+    public static final String SpeakOutResp = "SpeakOutResp";
+    /**
+     * 大厅接收消息响应
+     * Eg.  SpeakOutResp|NickName|SpeakOutMsg
+     */
 }
