@@ -244,6 +244,16 @@ public class TransmitMsg {
                         }
                         sendMsg(msgstr);
                     }
+                    /******************************大厅发送消息*****************************************/
+                    if(rcvstrs[0].equals(DeleteFriendListReq))
+                    {
+                        String deletefriendstate = "1";
+                        if(1==sqlconn.deleteUserUser(socketBean.getId(),Integer.valueOf(rcvstrs[1])))
+                            deletefriendstate = "0";
+                        msgstr = ProcessString.addstr(DeleteFriendListResp,deletefriendstate);
+                        sendMsg(msgstr);
+                    }
+
                     /******************************数据处理完毕，等待下次接收数据*************************/
                 }
             } catch (Exception e) {

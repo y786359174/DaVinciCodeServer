@@ -1,4 +1,5 @@
 package util;
+
 /**
  * 各种标识
  * 枚举不会用，就存一下数据格式了
@@ -79,7 +80,16 @@ public class Action {
      * Eg.  GetFriendListResp|ID|NickName|...
      */
 
-
+    public static final String DeleteFriendListReq = "DeleteFriendListReq";
+    /**
+     * 获取好友列表请求
+     * Eg.  GetFriendListReq
+     */
+    public static final String DeleteFriendListResp = "DeleteFriendListResp";
+    /**
+     * 获取好友列表响应
+     * Eg.  GetFriendListResp|ID|NickName|...
+     */
 
 
 

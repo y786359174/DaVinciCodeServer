@@ -112,7 +112,35 @@ public class MySqlUtil{
         }
         return i;//返回影响的行数，1为执行成功
     }
+    public int deleteUserUser(int user1,int user2)
+    {
+        int useridmin ,useridmax;
 
+        if(user2 < user1 ) {
+            useridmin = user2;
+            useridmax = user1;
+        }
+        else if(user1 < user2)
+        {
+            useridmin = user1;
+            useridmax = user2;
+        }
+        else return 0;
+        String sql = "delete from user_user where n_user1_id = " + useridmin  +   " and n_user2_id = " + useridmax ;
+        System.out.println(sql);
+        int i=0;
+        Connection conn = getConn();//此处为通过自己写的方法getConn()获得连接
+        try
+        {
+            Statement stmt = conn.createStatement();
+            i = stmt.executeUpdate(sql);
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return i;//如果返回的是1，则执行成功;
+    }
     /*
     public int insert()
     {
