@@ -1,11 +1,13 @@
+import util.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import util.*;
+import static util.Action.*;
 
 /** TransmitMsg
  *  用于连接Socket及处理接收信息
@@ -35,12 +37,12 @@ public class TransmitMsg {
 //        } catch (UnknownHostException e) {
 //            e.printStackTrace();
 //        }
-        SOCKET_IP =CustomSystemUtil.INTERNET_IP;
+        SOCKET_IP = CustomSystemUtil.INTERNET_IP;
         try {
             ServerSocket server = new ServerSocket(SOCKET_PORT);
             System.out.println("Socket Server Open\nip="+SOCKET_IP+"\nport="+SOCKET_PORT);
             while (true) {
-                SocketBean socketBean = new SocketBean(server.accept(),DateUtil.getTimeId());      //阻塞等待客户端申请链接，并同意
+                SocketBean socketBean = new SocketBean(server.accept(), DateUtil.getTimeId());      //阻塞等待客户端申请链接，并同意
                 mSocketList.add(socketBean);
                 new Thread(new TransmitMsg.ServerThread(socketBean)).start();                       //新建线程用于该信号
                 System.out.println("server connection succeed");
@@ -174,7 +176,7 @@ public class TransmitMsg {
 
                     /******************************接收到数据后进行处理*********************************/
                     /******************************登录**********************************************/
-                    if (rcvstrs[0].equals("LoginReq") )                        //登录请求
+                    if (rcvstrs[0].equals(LoginReq) )                        //登录请求
                     {
                         String loginstate = "0";
                         UserBean userBean = sqlconn.selectUser(rcvstrs[1]);         //获取登录名的userbean
@@ -183,25 +185,25 @@ public class TransmitMsg {
                             if(userBean.getPassWord().equals(rcvstrs[2]))                //密码相等
                             {
                                 loginstate = "0";
-                                msgstr = ProcessString.addstr("LoginResp",loginstate,Long.toString(userBean.getId()),userBean.getNickName());
+                                msgstr = ProcessString.addstr(LoginResp,loginstate,Integer.toString(userBean.getId()),userBean.getNickName());
                                 socketBean.setId(userBean.getId());
                                 socketBean.setNickName(userBean.getNickName());
                                 socketBean.setUserName(userBean.getUserName());
                                 socketBean.setLoginTime(DateUtil.getNowTime());
                             }else{                                                  //密码不等
                                 loginstate = "2";
-                                msgstr = ProcessString.addstr("LoginResp",loginstate);
+                                msgstr = ProcessString.addstr(LoginResp,loginstate);
                             }
                         }
                         else
                         {
                             loginstate = "1";
-                            msgstr = ProcessString.addstr("LoginResp",loginstate);
+                            msgstr = ProcessString.addstr(LoginResp,loginstate);
                         }
                             sendMsg(msgstr);
                     }
                     /******************************注册**********************************************/
-                    if(rcvstrs[0].equals("RegisterReq"))
+                    if(rcvstrs[0].equals(RegisterReq))
                     {
                         String registerstate = "0";
                         UserBean userBean1 = sqlconn.selectUser(rcvstrs[2]);         //获取登录名的userbean
@@ -213,7 +215,7 @@ public class TransmitMsg {
                             userBean.setNickName(rcvstrs[1]);
                             userBean.setUserName(rcvstrs[2]);
                             userBean.setPassWord(rcvstrs[3]);
-                            if(1==sqlconn.insert(userBean))
+                            if(1==sqlconn.insertUser(userBean))
                             {
                                 registerstate = "0";                                //成功
                             }else
@@ -222,20 +224,31 @@ public class TransmitMsg {
                             }
 
                         }
-                        msgstr = ProcessString.addstr("RegisterResp",registerstate);
+                        msgstr = ProcessString.addstr(RegisterResp,registerstate);
                         sendMsg(msgstr);
                     }
                     /******************************大厅发送消息*****************************************/
-                    if(rcvstrs[0].equals("SpeakOutReq"))
+                    if(rcvstrs[0].equals(SpeakOutReq))
                     {
-                        msgstr = ProcessString.addstr("SpeakOutResp",rcvstrs[1],rcvstrs[2]);
+                        msgstr = ProcessString.addstr(SpeakOutResp,rcvstrs[1],rcvstrs[2]);
                         CrossThreadSendMsg(msgstr);
+                    }
+                    /******************************大厅发送消息*****************************************/
+                    if(rcvstrs[0].equals(GetFriendListReq))
+                    {
+                        ArrayList<UserBean> userBeanList = sqlconn.selectUserUser(socketBean.getId());
+                        msgstr = GetFriendListResp;
+                        for(int i = 0;i<userBeanList.size();i++)
+                        {
+                            msgstr = ProcessString.addstr(msgstr,Integer.toString(userBeanList.get(i).getId()),userBeanList.get(i).getNickName());
+                        }
+                        sendMsg(msgstr);
                     }
                     /******************************数据处理完毕，等待下次接收数据*************************/
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("receive message failed");
+                System.out.println("receive message failed,close socket thread");
             }
         }
     }

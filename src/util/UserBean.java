@@ -1,5 +1,7 @@
+package util;
+
 public class UserBean {
-    private Long id;          //用户ID，不显示
+    private int id;          //用户ID，不显示
     private String userName;     //用户名，仅登录
     private String nickName;     //昵称，显示用
     private String passWord;     //密码，登录检测
@@ -8,11 +10,11 @@ public class UserBean {
         this.nickName = nickName;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

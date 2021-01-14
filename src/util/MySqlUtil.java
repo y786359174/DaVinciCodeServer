@@ -1,6 +1,9 @@
-import java.sql.*;
+package util;
 
-class MySqlUtil{
+import java.sql.*;
+import java.util.ArrayList;
+
+public class MySqlUtil{
     private String dbDriver="com.mysql.cj.jdbc.Driver";
     private String dbUrl="jdbc:mysql://101.200.125.165:3306/davinci?useSSL = false&serverTimezone=UTC";//根据实际情况变化
     private String dbUser="root";
@@ -40,7 +43,7 @@ class MySqlUtil{
             if(rs.next())
             {
                 userBean =new UserBean();
-                userBean.setId(rs.getLong("n_id"));//rs.getInt(1)，获取表第一列
+                userBean.setId(rs.getInt("n_id"));//rs.getInt(1)，获取表第一列
                 userBean.setUserName(rs.getString("c_username"));
                 userBean.setNickName(rs.getString("c_nickname"));
                 userBean.setPassWord(rs.getString("c_password"));
@@ -54,7 +57,43 @@ class MySqlUtil{
         }
         return userBean;
     }
-    public int insert(UserBean userBean)
+    public ArrayList<UserBean> selectUserUser(int userId)
+    {
+        ArrayList<UserBean> userBeanList = new ArrayList();
+        String sql1 = "select b.n_id,b.c_nickname from user_user a inner join user b on a.n_user2_id = b.n_id where n_user1_id = "+userId+";";
+        String sql2 = "select b.n_id,b.c_nickname from user_user a inner join user b on a.n_user1_id = b.n_id where n_user2_id = "+userId+";";
+        try
+        {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql1);
+            while(rs.next())
+            {
+                UserBean userBean =new UserBean();
+                userBean.setId(rs.getInt("n_id"));//rs.getInt(1)，获取表第一列
+                userBean.setNickName(rs.getString("c_nickname"));
+                userBeanList.add(userBean);
+            }
+
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql2);
+            while(rs.next())
+            {
+                UserBean userBean =new UserBean();
+                userBean.setId(rs.getInt("n_id"));//rs.getInt(1)，获取表第一列
+                userBean.setNickName(rs.getString("c_nickname"));
+                userBeanList.add(userBean);
+            }
+            //可以将查找到的值写入类，然后返回相应的对象
+        }
+        catch (SQLException e)
+        {
+            System.out.println("selectUser wrong");
+            e.printStackTrace();
+        }
+        return userBeanList;
+    }
+
+    public int insertUser(UserBean userBean)
     {
         int i=0;
         String sql="insert into user values(?,?,?,?)";
