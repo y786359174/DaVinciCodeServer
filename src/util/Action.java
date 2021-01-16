@@ -80,17 +80,49 @@ public class Action {
      * Eg.  GetFriendListResp|ID|NickName|...
      */
 
-    public static final String DeleteFriendListReq = "DeleteFriendListReq";
+    public static final String DeleteFriendReq = "DeleteFriendReq";
     /**
-     * 获取好友列表请求
-     * Eg.  GetFriendListReq
+     * 删除好友请求
+     * Eg.  DeleteFriendReq|ID
      */
-    public static final String DeleteFriendListResp = "DeleteFriendListResp";
+    public static final String DeleteFriendResp = "DeleteFriendResp";
     /**
-     * 获取好友列表响应
-     * Eg.  GetFriendListResp|ID|NickName|...
+     * 删除好友响应
+     * Eg.  DeleteFriendResp|deleteState
      */
 
+    public static final String AddFriendReq = "AddFriendReq";
+    /**
+     * 添加好友请求
+     * Eg.  AddFriendReq|ID/NickName
+     */
+    public static final String AddFriendResp = "AddFriendResp";
+    /**
+     * 添加好友响应
+     * Eg.  AddFriendResp|addFriendState|NickName
+     * 0申请成功，1没有这个人，2已经是好友了，3直接添加上了，4未知的错误
+     */
 
+    public static final String GetApplyListReq = "GetApplyListReq";
+    /**
+     * 获取申请列表请求
+     * Eg.  GetApplyListReq
+     */
+    public static final String GetApplyListResp = "GetApplyListResp";
+    /**
+     * 获取申请列表响应
+     * Eg.  GetApplyListResp|ID|NickName|...
+     */
 
+    public static final String ApplyFriendReq = "ApplyFriendReq";
+    /**
+     * 操作申请好友请求（同意/拒绝）
+     * Eg.  ApplyFriendReq|ID|0/1
+     */
+    public static final String ApplyFriendResp = "ApplyFriendResp";
+    /**
+     * 操作申请好友响应（同意/拒绝）
+     * Eg.  ApplyFriendResp|applyfriendstate
+
+     */
 }

@@ -233,24 +233,85 @@ public class TransmitMsg {
                         msgstr = ProcessString.addstr(SpeakOutResp,rcvstrs[1],rcvstrs[2]);
                         CrossThreadSendMsg(msgstr);
                     }
-                    /******************************大厅发送消息*****************************************/
+                    /******************************好友列表*****************************************/
                     if(rcvstrs[0].equals(GetFriendListReq))
                     {
                         ArrayList<UserBean> userBeanList = sqlconn.selectUserUser(socketBean.getId());
                         msgstr = GetFriendListResp;
+                        for (UserBean userBean : userBeanList) {
+                            msgstr = ProcessString.addstr(msgstr, Integer.toString(userBean.getId()), userBean.getNickName());
+                        }
+                        sendMsg(msgstr);
+                    }
+                    /******************************删除好友*****************************************/
+                    if(rcvstrs[0].equals(DeleteFriendReq))
+                    {
+                        String deletefriendstate = "1";
+                        if(1==sqlconn.deleteUserUser(socketBean.getId(),Integer.parseInt(rcvstrs[1])))
+                            deletefriendstate = "0";
+                        msgstr = ProcessString.addstr(DeleteFriendResp,deletefriendstate);
+                        sendMsg(msgstr);
+                    }
+                    /******************************添加好友*****************************************/
+                    if(rcvstrs[0].equals(AddFriendReq))
+                    {
+                        String addfriendstate = "4";
+                        UserBean userBean1 = sqlconn.selectUser(Integer.parseInt(rcvstrs[1]));         //获取登录名的userbean
+                        if(userBean1!=null)                                                           //存在该username
+                        {
+                            if(1==sqlconn.selectUserUser(socketBean.getId(),userBean1.getId()))       //不存在这对好友
+                            {
+                                if(1 == sqlconn.selectUserUserAgree(socketBean.getId(), userBean1.getId()))     //没有申请过我
+                                {
+                                    if (1 == sqlconn.insertUserUserAgree(socketBean.getId(), userBean1.getId()))
+                                        addfriendstate = "0";                                //申请成功
+                                    else
+                                        addfriendstate = "4";                                    //未知的错误
+                                }
+                                else                                                                    //申请过我
+                                {
+                                    if(1==sqlconn.deleteUserUserAgree(socketBean.getId(),Integer.parseInt(rcvstrs[1])))
+                                        if(1==sqlconn.insertUserUser(socketBean.getId(),Integer.parseInt(rcvstrs[1])))
+                                            addfriendstate="3"; //直接添加上了
+                                }
+                            }
+                            else
+                                addfriendstate = "2";                                    //已经有这个好友了
+                            msgstr = ProcessString.addstr(AddFriendResp, addfriendstate,userBean1.getNickName());
+                        }else {
+                            addfriendstate = "1";                                    //没有这个人
+                            msgstr = ProcessString.addstr(AddFriendResp, addfriendstate);
+                        }
+
+                        sendMsg(msgstr);
+                    }
+                    /******************************获取申请列表*****************************************/
+                    if(rcvstrs[0].equals(GetApplyListReq))
+                    {
+                        ArrayList<UserBean> userBeanList = sqlconn.selectUserUserAgree(socketBean.getId());
+                        msgstr = GetApplyListResp;
                         for(int i = 0;i<userBeanList.size();i++)
                         {
                             msgstr = ProcessString.addstr(msgstr,Integer.toString(userBeanList.get(i).getId()),userBeanList.get(i).getNickName());
                         }
                         sendMsg(msgstr);
                     }
-                    /******************************大厅发送消息*****************************************/
-                    if(rcvstrs[0].equals(DeleteFriendListReq))
+                    /******************************同意/拒绝申请好友*****************************************/
+                    if(rcvstrs[0].equals(ApplyFriendReq))
                     {
-                        String deletefriendstate = "1";
-                        if(1==sqlconn.deleteUserUser(socketBean.getId(),Integer.valueOf(rcvstrs[1])))
-                            deletefriendstate = "0";
-                        msgstr = ProcessString.addstr(DeleteFriendListResp,deletefriendstate);
+                        String applyfriendstate = "1";
+                        if(1==sqlconn.deleteUserUserAgree(socketBean.getId(),Integer.parseInt(rcvstrs[1])))
+                            applyfriendstate="0";
+                        if(rcvstrs[2].equals("0"))
+                        {
+                            if(1==sqlconn.selectUserUser(socketBean.getId(),Integer.parseInt(rcvstrs[1])))  //不是我的好友
+                                if(1==sqlconn.insertUserUser(socketBean.getId(),Integer.parseInt(rcvstrs[1])))
+                                    applyfriendstate="0";
+                                else
+                                    applyfriendstate = "1";
+                        }
+
+                        msgstr = ProcessString.addstr(ApplyFriendResp,applyfriendstate);
                         sendMsg(msgstr);
                     }
 
